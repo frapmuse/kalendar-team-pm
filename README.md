@@ -27,16 +27,21 @@ App ini **tidak** bersambung dengan Google Calendar. Jemputan shoot tetap dihant
 | `manifest.webmanifest`, `sw.js`, `icons/` | Supaya boleh Add to Home Screen (PWA) |
 | `apps-script/Code.gs` | Kod storan data team (Google Apps Script) |
 
-## Storan data
+## Storan data (Supabase)
 
-- `API_URL` kosong = **mod cuba**: tanda disimpan dalam peranti itu sahaja.
-- `API_URL` diisi = **mod team**: semua orang kongsi data yang sama. Data disimpan dalam satu Google Sheet di belakang tabir; team cuma guna app.
-- Tiada PIN atau kata laluan dalam repo ini. PIN team disimpan dalam Script Properties Apps Script.
+- `SUPABASE_URL`/`SUPABASE_KEY` kosong = **mod cuba**: tanda disimpan dalam peranti itu sahaja.
+- Diisi = **mod team**: semua orang kongsi data yang sama.
+- Kunci anon/publishable dalam `config.js` memang awam. Ia hanya boleh panggil 3 fungsi (`avail_list`, `avail_toggle`, `avail_note`) yang semak PIN team dulu; jadual tak boleh dibaca terus.
+- PIN team disimpan dalam Supabase (skema `private`), bukan dalam repo.
+- Semua jadual/fungsi app ini berawalan `avail_` supaya projek Supabase yang sama boleh dikongsi dengan app lain.
 
-### Hidupkan mod team (sekali sahaja, ~5 minit, akaun Google boss)
+### Setup (sekali sahaja)
 
-1. Buka https://sheets.new, namakan Sheet "Kalendar Team PM (data)".
-2. Menu **Extensions > Apps Script**. Padam kod contoh, tampal isi `apps-script/Code.gs`, tekan Save.
-3. Ikon gear **Project Settings** > **Script Properties** > Add property: nama `TEAM_PIN`, nilai PIN 4-6 digit pilihan boss. Save.
-4. **Deploy > New deployment** > jenis **Web app**. Execute as: **Me**. Who has access: **Anyone**. Deploy, benarkan akses.
-5. Salin pautan Web app (berakhir `/exec`) dan beri kepada Claude untuk dimasukkan ke `config.js`.
+1. Supabase > **SQL Editor** > New query. Tampal isi `supabase/setup.sql`, tekan **Run**.
+2. Query baharu untuk tetapkan PIN team (tukar `1234`):
+   ```sql
+   insert into private.avail_settings (key, value) values ('team_pin', '1234')
+   on conflict (key) do update set value = excluded.value;
+   ```
+   Jalankan semula baris ini bila-bila untuk tukar PIN.
+3. Masukkan Project URL dan kunci publishable/anon ke `config.js`.

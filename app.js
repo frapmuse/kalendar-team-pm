@@ -4,8 +4,9 @@
 
   var CFG = window.APP_CONFIG || {};
   var AHLI = CFG.AHLI || [];
-  var API = (CFG.API_URL || "").trim();
-  var MODE_TEAM = !!API;
+  var SB_URL = (CFG.SUPABASE_URL || "").trim().replace(/\/+$/, "");
+  var SB_KEY = (CFG.SUPABASE_KEY || "").trim();
+  var MODE_TEAM = !!(SB_URL && SB_KEY);
 
   var BULAN = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
   var HARI_PENDEK = ["Isn", "Sel", "Rab", "Kha", "Jum", "Sab", "Ahd"];
@@ -66,16 +67,23 @@
   // ---------- storan data ----------
   var LOCAL_KEY = "pm_marks_v1";
   var store = MODE_TEAM ? {
-    call: function (body) {
-      body.pin = state.pin;
-      return fetch(API, { method: "POST", body: JSON.stringify(body), redirect: "follow" })
-        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-        .then(function (j) { if (!j.ok) throw new Error(j.error || "Ralat pelayan"); return j; });
+    // Panggil fungsi Supabase (setiap satu semak PIN team di pelayan)
+    call: function (fn, args) {
+      args.p_pin = state.pin;
+      var h = { "Content-Type": "application/json", apikey: SB_KEY };
+      if (!/^sb_/.test(SB_KEY)) h.Authorization = "Bearer " + SB_KEY; // kunci anon jenis lama (JWT)
+      return fetch(SB_URL + "/rest/v1/rpc/" + fn, { method: "POST", headers: h, body: JSON.stringify(args) })
+        .then(function (r) {
+          return r.json().catch(function () { return null; }).then(function (j) {
+            if (!r.ok) throw new Error((j && j.message) || ("HTTP " + r.status));
+            return j || [];
+          });
+        });
     },
-    list: function () { return this.call({ action: "list" }).then(function (j) { return j.marks; }); },
-    toggle: function (date, person) { return this.call({ action: "toggle", date: date, person: person }).then(function (j) { return j.marks; }); },
-    note: function (date, person, note) { return this.call({ action: "note", date: date, person: person, note: note }).then(function (j) { return j.marks; }); },
-    check: function (pin) { state.pin = pin; return this.call({ action: "list" }).then(function (j) { return j.marks; }); }
+    list: function () { return this.call("avail_list", {}); },
+    toggle: function (date, person) { return this.call("avail_toggle", { p_date: date, p_person: person }); },
+    note: function (date, person, note) { return this.call("avail_note", { p_date: date, p_person: person, p_note: note }); },
+    check: function (pin) { state.pin = pin; return this.list(); }
   } : {
     read: function () { try { return JSON.parse(lsGet(LOCAL_KEY) || "[]"); } catch (e) { return []; } },
     write: function (a) { lsSet(LOCAL_KEY, JSON.stringify(a)); return a; },

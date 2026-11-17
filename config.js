@@ -1,10 +1,13 @@
 // Tetapan app. Fail ini AWAM (repo GitHub Pages), jadi JANGAN letak kata laluan atau PIN di sini.
 //
-// API_URL: pautan "Web app" Google Apps Script (berakhir dengan /exec).
+// Storan team (Supabase). Kunci "anon / publishable" MEMANG awam dan selamat diletak di sini:
+// ia tak boleh baca/tulis data tanpa PIN team (PIN disimpan dalam Supabase, bukan dalam kod).
 //   - Kosong ""  = mod cuba: data disimpan dalam telefon/komputer ini sahaja (orang lain tak nampak).
-//   - Diisi     = mod team: semua orang kongsi data yang sama dalam Google Sheet.
+//   - Diisi     = mod team: semua orang kongsi data yang sama.
+// JANGAN letak kunci "service_role" / "secret" di sini.
 window.APP_CONFIG = {
-  API_URL: "",
+  SUPABASE_URL: "",   // cth "https://abcdefgh.supabase.co"
+  SUPABASE_KEY: "",   // kunci anon / publishable
 
   // Ahli team. Warna mesti konsisten. `wajib: true` = hari jadi MERAH bila orang ini tak available.
   AHLI: [
