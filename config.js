@@ -6,8 +6,8 @@
 //   - Diisi     = mod team: semua orang kongsi data yang sama.
 // JANGAN letak kunci "service_role" / "secret" di sini.
 window.APP_CONFIG = {
-  SUPABASE_URL: "",   // cth "https://abcdefgh.supabase.co"
-  SUPABASE_KEY: "",   // kunci anon / publishable
+  SUPABASE_URL: "https://rfxqslkmzammmitgrbdt.supabase.co",
+  SUPABASE_KEY: "sb_publishable_iaOE2on1je3m66_G8vqS2A_3hgApJ-F", // kunci publishable (awam)
 
   // Ahli team. Warna mesti konsisten. `wajib: true` = hari jadi MERAH bila orang ini tak available.
   AHLI: [
