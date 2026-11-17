@@ -9,6 +9,9 @@ window.APP_CONFIG = {
   SUPABASE_URL: "https://rfxqslkmzammmitgrbdt.supabase.co",
   SUPABASE_KEY: "sb_publishable_iaOE2on1je3m66_G8vqS2A_3hgApJ-F", // kunci publishable (awam)
 
+  // Hari tetap setiap minggu di mana semua orang dikunci (dow: 0=Ahad, 1=Isnin ... 4=Khamis).
+  TEAM_DAYS: [{ dow: 4, label: "Team meeting" }],
+
   // Ahli team. Warna mesti konsisten. `wajib: true` = hari jadi MERAH bila orang ini tak available.
   AHLI: [
     { id: "Firdaus", nama: "Firdaus", inisial: "F", warna: "#2DBBF9", wajib: true },

@@ -1,4 +1,4 @@
-/* Neon cats: two cats walk and climb over the calendar dates, fight when they meet face to face,
+/* Cats: two cats walk and climb over the calendar dates, fight when they meet face to face,
    and show a reminder or a wish when tapped. Pure decoration; never changes any data. */
 (function () {
   "use strict";
@@ -8,23 +8,41 @@
   if (!cal || !grid) return;
 
   var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var W = 40, H = 28, FEET = 26; // cat box and where its feet are inside it
+  var W = 56, H = 38, FEET = 37; // cat box and where its feet are inside it
 
-  // Solid (non-neon) cat, colours from CSS variables --fur, --line, --eye set per cat
-  var LEG = function (d) { return '<path class="ol" d="' + d + '"/><path class="fl" d="' + d + '"/>'; };
-  var SVG =
-    '<svg viewBox="0 0 40 28" width="40" height="28" aria-hidden="true">' +
-    '<g class="tail"><path class="ol" d="M10 14 C3 12 3 5 7 2"/><path class="fl" d="M10 14 C3 12 3 5 7 2"/></g>' +
-    '<g class="legs a">' + LEG("M12 19 L11 25.5 M25 19 L26 25.5") + '</g>' +
-    '<g class="legs b">' + LEG("M14 19 L15 25.5 M23 19 L22 25.5") + '</g>' +
-    '<rect class="fur" x="8" y="10" width="21" height="10" rx="5"/>' +
-    '<path class="fur" d="M26 6.5 L27 0 L30.5 4 Z M32 4 L35.5 0 L36.4 6.5 Z"/>' +
-    '<circle class="fur" cx="31" cy="9" r="6"/>' +
-    '<path class="inner" d="M27.2 4.6 L27.6 1.8 L29.2 3.8 Z M33 3.8 L35 1.8 L35.4 4.6 Z"/>' +
-    '<ellipse class="eye" cx="29.4" cy="8.4" rx="1.1" ry="1.4"/><ellipse class="eye" cx="33.2" cy="8.4" rx="1.1" ry="1.4"/>' +
-    '<path class="nose" d="M30.6 10.6 h1.6 l-.8 .9 z"/>' +
-    '<path class="wh" d="M34.5 11 h4.5 M34.5 12.2 l4 1.2 M28 11 h-4 M28 12.2 l-3.6 1.2"/>' +
-    "</svg>";
+  // Realistic-style cat (side view, facing right). Colours come from the per-cat gradient.
+  var COLORS = {
+    white: { top: "#ffffff", bot: "#d9dee6", line: "#aab4c3", muzzle: "#ffffff", ear: "#ffb8c9", eye: "#4a90e2", shade: "rgba(60,80,110,.16)" },
+    black: { top: "#3d424b", bot: "#0b0c0f", line: "#7b889c", muzzle: "#26292f", ear: "#6a4f5a", eye: "#f5c518", shade: "rgba(255,255,255,.10)" }
+  };
+  var LEG = "M-2.2 -1 L2.2 -1 L1.5 6 L1.3 10.9 Q2.6 11.2 2.4 12.2 Q2.2 12.7 0.6 12.7 L-1.2 12.7 Q-2 12.7 -1.9 11.6 L-1.6 6 Z";
+  function svgFor(kind) {
+    var c = COLORS[kind], g = "cg-" + kind, gd = "cgd-" + kind;
+    function leg(cls, x, y, fill) {
+      return '<g transform="translate(' + x + "," + y + ')"><path class="leg ' + cls + '" d="' + LEG + '" fill="' + fill + '" stroke="' + c.line + '" stroke-width=".6"/></g>';
+    }
+    return '<svg viewBox="0 0 56 38" width="56" height="38" aria-hidden="true">' +
+      '<defs><linearGradient id="' + g + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + c.top + '"/><stop offset="1" stop-color="' + c.bot + '"/></linearGradient>' +
+      '<linearGradient id="' + gd + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + c.bot + '"/><stop offset="1" stop-color="' + c.bot + '" stop-opacity=".85"/></linearGradient></defs>' +
+      '<g class="tail"><path d="M13 21 C5.5 20 2 13 5 5.5 C6 3.5 8.8 4.2 8.2 6.6 C6.3 11.8 8.3 16.8 13.6 17.4 Z" fill="url(#' + g + ')" stroke="' + c.line + '" stroke-width=".6"/></g>' +
+      leg("b2", 18, 24, "url(#" + gd + ")") + leg("f2", 38.5, 24, "url(#" + gd + ")") +
+      '<path d="M13 22 C13 16 19 13.5 27 14 C33 14.4 38 13 42 14.5 C46.5 16 47.2 23 44 26.6 C40 29.6 20 30 16 28.6 C13.5 27.6 13 25 13 22 Z" fill="url(#' + g + ')" stroke="' + c.line + '" stroke-width=".6"/>' +
+      '<path d="M16 16.5 C22 14.2 34 15.8 42 15.2" fill="none" stroke="' + c.shade + '" stroke-width="1.6" stroke-linecap="round"/>' +
+      '<ellipse cx="29" cy="27" rx="12" ry="2.2" fill="' + c.shade + '"/>' +
+      leg("b1", 20.5, 24.5, "url(#" + g + ")") + leg("f1", 41.5, 24.5, "url(#" + g + ")") +
+      '<g class="head">' +
+      '<path d="M42.4 9.5 L43.2 1.6 L48.6 6.6 Z M49.6 6.2 L54.6 1.8 L54.9 9.8 Z" fill="url(#' + g + ')" stroke="' + c.line + '" stroke-width=".6" stroke-linejoin="round"/>' +
+      '<path d="M43.7 7.8 L44.1 3.6 L47 6.6 Z M50.8 6.4 L53.6 3.8 L53.8 8 Z" fill="' + c.ear + '"/>' +
+      '<ellipse cx="49" cy="11.8" rx="7.1" ry="6.3" fill="url(#' + g + ')" stroke="' + c.line + '" stroke-width=".6"/>' +
+      '<ellipse cx="52.6" cy="14" rx="3.1" ry="2.2" fill="' + c.muzzle + '"/>' +
+      '<g class="eyes"><ellipse cx="47.4" cy="10.6" rx="1.55" ry="1.25" fill="' + c.eye + '"/><ellipse cx="51.6" cy="10.6" rx="1.4" ry="1.2" fill="' + c.eye + '"/>' +
+      '<ellipse cx="47.5" cy="10.6" rx=".45" ry="1.05" fill="#111"/><ellipse cx="51.7" cy="10.6" rx=".42" ry="1" fill="#111"/>' +
+      '<circle cx="47.9" cy="10.1" r=".33" fill="#fff"/><circle cx="52.05" cy="10.1" r=".3" fill="#fff"/></g>' +
+      '<path d="M53.5 12.7 h1.5 l-.75 .95 z" fill="#ff8fa3"/>' +
+      '<path d="M54.25 13.7 q-.3 1 -1.3 .8 M54.25 13.7 q.4 .9 1.2 .6" fill="none" stroke="' + c.line + '" stroke-width=".4" stroke-linecap="round"/>' +
+      '<path d="M53.4 13.9 l4.2 -.9 M53.4 14.6 l4.3 .3 M53.2 15.2 l3.8 1.2" fill="none" stroke="' + c.line + '" stroke-width=".3" opacity=".9"/>' +
+      "</g></svg>";
+  }
 
   var layer = document.createElement("div");
   layer.className = "cat-layer";
@@ -53,9 +71,9 @@
     var el = document.createElement("button");
     el.className = "cat";
     el.type = "button";
-    el.setAttribute("aria-label", name + " the neon cat. Tap for a message.");
+    el.setAttribute("aria-label", name + " the cat. Tap for a message.");
     el.classList.add(color);
-    el.innerHTML = SVG;
+    el.innerHTML = svgFor(color);
     layer.appendChild(el);
     var cat = { name: name, el: el, row: startRow, x: startX, dir: dir, speed: 0.35 + Math.random() * 0.15,
       mode: "walk", until: 0, jump: null, step: 0, cool: 0, voice: voice };

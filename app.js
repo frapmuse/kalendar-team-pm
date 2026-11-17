@@ -63,11 +63,19 @@
     state.marks.forEach(function (r) { (m[r.date] = m[r.date] || {})[r.person] = r; });
     return m;
   }
-  // ok = everyone free, warn = someone away, bad = a key person (Firdaus/Amin) away
-  function statusOf(dm) {
+  // ok = everyone free, warn = someone away (boss asked for two colours only, no red)
+  // Weekly team days (e.g. Thursday team meeting): everyone is locked, no shoot
+  var TEAM_DAYS = CFG.TEAM_DAYS || [];
+  function teamDay(k) {
+    var dow = fromKey(k).getDay();
+    for (var i = 0; i < TEAM_DAYS.length; i++) if (TEAM_DAYS[i].dow === dow) return TEAM_DAYS[i].label;
+    return null;
+  }
+  function statusOf(dm, k) {
+    if (k && teamDay(k)) return "lock";
     var ids = Object.keys(dm || {});
     if (!ids.length) return "ok";
-    return ids.some(function (id) { return KEY_IDS.indexOf(id) >= 0; }) ? "bad" : "warn";
+    return ids.length ? "warn" : "ok";
   }
 
   // ---------- data storage ----------
@@ -149,21 +157,22 @@
     for (var i = 0; i < lead; i++) html += '<div class="day out" aria-hidden="true"></div>';
     for (var d = 1; d <= days; d++) {
       var k = key(new Date(y, mo, d)), dm = map[k] || {}, past = k < t;
-      var cls = ["day", past ? "past" : statusOf(dm)];
+      var cls = ["day", past ? "past" : statusOf(dm, k)];
       if (k === t) cls.push("today");
       if (k === state.sel) cls.push("sel");
       if (dm[state.me]) cls.push("mine");
-      var away = AHLI.filter(function (a) { return dm[a.id]; });
-      var aria = longLabel(k) + ". " + (away.length ? "Not available: " + away.map(function (a) { return a.nama; }).join(", ") : "Everyone available");
+      var team = teamDay(k);
+      var away = team ? AHLI : AHLI.filter(function (a) { return dm[a.id]; });
+      var aria = longLabel(k) + ". " + (team ? team + ", everyone busy" : away.length ? "Not available: " + away.map(function (a) { return a.nama; }).join(", ") : "Everyone available");
       html += '<button class="' + cls.join(" ") + '" data-k="' + k + '" aria-label="' + esc(aria) + '"><span class="num">' + d +
-        '</span><span class="dots">' + away.map(dotHtml).join("") + "</span></button>";
+        '</span><span class="dots' + (away.length > 2 ? " many" : "") + '">' + away.map(dotHtml).join("") + "</span></button>";
     }
     $("grid").innerHTML = html;
   }
 
   function freeDays(n) {
     var t = today(), map = byDate(), out = [];
-    for (var i = 0; i < n; i++) { var k = key(addDays(t, i)); if (statusOf(map[k]) === "ok") out.push(k); }
+    for (var i = 0; i < n; i++) { var k = key(addDays(t, i)); if (statusOf(map[k], k) === "ok") out.push(k); }
     return out;
   }
 
@@ -182,17 +191,18 @@
   }
 
   function renderDetail() {
-    var k = state.sel, dm = byDate()[k] || {}, past = k < key(today()), st = statusOf(dm);
-    var pill = past ? ["past", "Past date"] : st === "ok" ? ["ok", "● Everyone free · OK to lock shoot"] : st === "warn" ? ["warn", "● Someone is away"] : ["bad", "● " + KEY_IDS.join("/") + " away"];
+    var k = state.sel, dm = byDate()[k] || {}, past = k < key(today()), st = statusOf(dm, k), team = teamDay(k);
+    var pill = past ? ["past", "Past date"] : team ? ["lock", "🔒 " + team + " · everyone busy"] : st === "ok" ? ["ok", "● Everyone free · OK to lock shoot"] : ["warn", "● Someone is away"];
     var rows = AHLI.map(function (a) {
       var r = dm[a.id];
+      if (team) return "<li>" + dotHtml(a) + '<span class="who">' + esc(a.nama) + '<span class="meta">' + esc(team) + '</span></span><span class="tag lock">Locked</span></li>';
       return "<li>" + dotHtml(a) + '<span class="who">' + esc(a.nama) + (r && r.note ? '<span class="meta">' + esc(r.note) + "</span>" : "") + "</span>" +
         (r ? '<span class="tag no">Away</span>' : '<span class="tag ok">Free</span>') + "</li>";
     }).join("");
 
     var act = "";
     var mine = dm[state.me];
-    if (state.me && !past) {
+    if (state.me && !past && !team) {
       if (mine) {
         act = '<div class="mine-box"><h4>My mark</h4>' +
           '<label class="f" for="noteIn" style="margin-top:0">Note (optional, everyone can see it)</label>' +
@@ -214,6 +224,7 @@
   function toggle(k) {
     if (!state.me) return openWho();
     if (k < key(today())) return toast("That date has passed.");
+    if (teamDay(k)) return toast("🔒 " + teamDay(k) + " day. Everyone is locked.");
     if (state.busy) return;
     var before = state.marks.slice();
     var had = state.marks.some(function (r) { return r.date === k && r.person === state.me; });
@@ -316,7 +327,8 @@
     var awayTmr = AHLI.filter(function (a) { return tomorrow[a.id]; }).map(function (a) { return first(a.nama); });
     if (awayTmr.length) lines.push("Heads up: " + awayTmr.join(" & ") + (awayTmr.length > 1 ? " are" : " is") + " away tomorrow 👀");
     else lines.push("Everyone's free tomorrow 🐾");
-    if (statusOf(todayDm) === "ok") lines.push("Everyone's free today. Good day to shoot! 🎬");
+    if (teamDay(key(t))) lines.push(teamDay(key(t)) + " today, everyone 📋");
+    else if (statusOf(todayDm, key(t)) === "ok") lines.push("Everyone's free today. Good day to shoot! 🎬");
     var next = freeDays(30).filter(function (k) { return k > key(t); })[0];
     lines.push(next ? "Next day everyone's free: " + shortLabel(next) + " ✨" : "No full-team day in the next 30 days 😿");
     if (me) {
