@@ -23,9 +23,9 @@ App ini **tidak** bersambung dengan Google Calendar. Jemputan shoot tetap dihant
 | Fail | Guna |
 | --- | --- |
 | `index.html`, `app.js` | App |
-| `config.js` | Tetapan: senarai ahli, warna, siapa "wajib", pautan storan (`API_URL`) |
+| `config.js` | Tetapan: senarai ahli, warna, siapa "wajib", sambungan Supabase (`SUPABASE_URL`, `SUPABASE_KEY`) |
 | `manifest.webmanifest`, `sw.js`, `icons/` | Supaya boleh Add to Home Screen (PWA) |
-| `apps-script/Code.gs` | Kod storan data team (Google Apps Script) |
+| `supabase/setup.sql` | Skrip sekali jalan untuk sediakan storan data team di Supabase |
 
 ## Storan data (Supabase)
 
