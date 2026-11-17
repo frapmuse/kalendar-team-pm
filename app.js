@@ -53,6 +53,7 @@
     sel: key(today()),
     mode: lsGet("pm_mode") === "view" ? "view" : "mark",
     findDays: 60,
+    tab: lsGet("pm_tab") === "lock" ? "lock" : "free",
     locks: {},          // from boss's Google Calendar (Tangerine = PM): {date: [{title, time}]}
     lastSync: null,
     busy: false
@@ -212,9 +213,13 @@
   function renderLockPanel() {
     var t = key(today());
     var ks = Object.keys(state.locks).filter(function (k) { return k >= t; }).sort();
-    var el = $("lockPanel");
-    if (!CAL_URL) { el.hidden = true; return; }
-    el.hidden = false;
+    var el = $("lockPanel"), tabs = $("listTabs");
+    var tab = CAL_URL ? state.tab : "free";
+    tabs.hidden = !CAL_URL;
+    el.hidden = tab !== "lock"; $("freePanel").hidden = tab !== "free";
+    Array.prototype.forEach.call(tabs.children, function (b) { b.setAttribute("aria-pressed", b.dataset.t === tab); });
+    $("lockCount").textContent = ks.length ? "(" + ks.length + ")" : "";
+    if (!CAL_URL) return;
     var rows = ks.map(function (k) {
       return state.locks[k].map(function (x) {
         return '<li><button data-k="' + k + '"><span class="ld">' + esc(shortLabel(k)) + '</span><span class="lt">' + esc(x.title) +
@@ -398,6 +403,7 @@
   $("modeView").onclick = function () { state.mode = "view"; lsSet("pm_mode", "view"); render(); };
   $("meBtn").onclick = function () { openWho(); };
   $("findBtn").onclick = openFind;
+  $("listTabs").onclick = function (e) { var b = e.target.closest("button[data-t]"); if (b) { state.tab = b.dataset.t; lsSet("pm_tab", state.tab); render(); } };
   $("sheetBg").onclick = function (e) { if (e.target === this && !this.dataset.locked) closeSheet(); };
 
   // Swipe left/right to change month
