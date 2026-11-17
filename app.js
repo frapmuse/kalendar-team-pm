@@ -310,6 +310,29 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2400);
   }
 
+  // ---------- lines for the neon cats (reminders from real data + wishes) ----------
+  function catLines() {
+    var t = today(), map = byDate(), lines = [], me = person(state.me);
+    var tk = key(addDays(t, 1)), tomorrow = map[tk] || {}, todayDm = map[key(t)] || {};
+    var awayTmr = AHLI.filter(function (a) { return tomorrow[a.id]; }).map(function (a) { return first(a.nama); });
+    if (awayTmr.length) lines.push("Heads up: " + awayTmr.join(" & ") + (awayTmr.length > 1 ? " are" : " is") + " away tomorrow 👀");
+    else lines.push("Everyone's free tomorrow 🐾");
+    if (statusOf(todayDm) === "ok") lines.push("Everyone's free today. Good day to shoot! 🎬");
+    var next = freeDays(30).filter(function (k) { return k > key(t); })[0];
+    lines.push(next ? "Next day everyone's free: " + shortLabel(next) + " ✨" : "No full-team day in the next 30 days 😿");
+    if (me) {
+      var mine = state.marks.filter(function (r) { return r.person === me.id && r.date >= key(t); }).length;
+      lines.push(mine ? "You have " + mine + " day" + (mine > 1 ? "s" : "") + " marked as away. Still correct? 🤔"
+        : "Any days you can't make it? Tap them so the team knows 🐾");
+    }
+    var dow = t.getDay();
+    if (dow === 1) lines.push("New week, new content 💪");
+    if (dow === 5) lines.push("Happy Friday, team PM! 🎉");
+    lines.push("Have an awesome shoot! 🎬", "Drink some water 💧", "You're doing great, team PM 💙", "Meow. Lock that date, boss 😼", "Purr... good vibes only ✨");
+    return lines;
+  }
+  window.PMApp = { catLines: catLines };
+
   // ---------- wire up ----------
   $("grid").onclick = function (e) { var b = e.target.closest(".day[data-k]"); if (b) onDayTap(b.dataset.k); };
   $("prevBtn").onclick = function () { state.view = new Date(state.view.getFullYear(), state.view.getMonth() - 1, 1); render(); };
