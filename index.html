@@ -104,6 +104,11 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .chip b{display:block;font-size:18px;font-weight:600}
 .chip .t{display:block;font-size:10.5px;color:var(--ok);white-space:nowrap}
 .empty{font-size:13px;color:var(--faint)}
+.lock-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.lock-list button{width:100%;display:flex;gap:12px;align-items:center;text-align:left;border:1px solid rgba(255,138,61,.3);background:rgba(255,138,61,.08);border-radius:12px;padding:9px 12px;color:inherit;font:inherit}
+.lock-list .ld{flex:none;min-width:84px;font-weight:600;color:var(--team);font-size:13px}
+.lock-list .lt{font-size:13px;line-height:1.3}
+.lock-list .meta{display:block;font-size:11px;color:var(--muted)}
 /* Butiran hari */
 .detail h3.date{margin:0;font-size:19px;font-weight:600;letter-spacing:.2px;text-transform:none;color:var(--ink)}
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;padding:4px 10px;border-radius:999px;margin:8px 0 4px;border:1px solid}
@@ -252,11 +257,12 @@ label.f{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;letter
     <div class="legend">
       <span><i class="sw" style="background:var(--ok);box-shadow:0 0 6px var(--ok)"></i>Everyone free</span>
       <span><i class="sw" style="background:var(--warn);box-shadow:0 0 6px var(--warn)"></i>Someone away</span>
-      <span><i class="sw" style="background:var(--team);box-shadow:0 0 6px var(--team);height:10px;width:12px;border-radius:3px"></i>Team meeting (Thu)</span>
+      <span><i class="sw" style="background:var(--team);box-shadow:0 0 6px var(--team);height:10px;width:12px;border-radius:3px"></i>Locked (meeting / PM calendar)</span>
     </div>
   </section>
 
   <section class="glass sec" id="freePanel"></section>
+  <section class="glass sec" id="lockPanel" hidden></section>
   <section class="glass sec detail" id="detail"></section>
 
   <div class="find">

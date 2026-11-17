@@ -7,6 +7,7 @@
   var SB_URL = (CFG.SUPABASE_URL || "").trim().replace(/\/+$/, "");
   var SB_KEY = (CFG.SUPABASE_KEY || "").trim();
   var MODE_TEAM = !!(SB_URL && SB_KEY);
+  var CAL_URL = (CFG.CALENDAR_URL || "").trim();
 
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   var DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -52,6 +53,7 @@
     sel: key(today()),
     mode: lsGet("pm_mode") === "view" ? "view" : "mark",
     findDays: 60,
+    locks: {},          // from boss's Google Calendar (Tangerine = PM): {date: [{title, time}]}
     lastSync: null,
     busy: false
   };
@@ -69,6 +71,8 @@
   function teamDay(k) {
     var dow = fromKey(k).getDay();
     for (var i = 0; i < TEAM_DAYS.length; i++) if (TEAM_DAYS[i].dow === dow) return TEAM_DAYS[i].label;
+    var c = state.locks[k];
+    if (c && c.length) return c.map(function (x) { return x.title; }).join(" · ");
     return null;
   }
   function statusOf(dm, k) {
@@ -116,8 +120,22 @@
 
   function setMarks(m) { state.marks = Array.isArray(m) ? m : []; state.lastSync = new Date(); render(); return state.marks; }
 
+  // Locked dates from boss's Google Calendar (read only). Failure is ignored quietly.
+  function loadLocks() {
+    if (!CAL_URL || (MODE_TEAM && !state.pin)) return;
+    fetch(CAL_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ pin: state.pin }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok || !Array.isArray(j.locks)) return;
+        var m = {};
+        j.locks.forEach(function (x) { if (x && /^\d{4}-\d{2}-\d{2}$/.test(x.date)) (m[x.date] = m[x.date] || []).push({ title: String(x.title || "PM"), time: x.time || null }); });
+        state.locks = m; render();
+      }).catch(function () {});
+  }
+
   function refresh(silent) {
     if (!state.me || (MODE_TEAM && !state.pin)) return;
+    loadLocks();
     return store.list().then(setMarks).catch(function (e) {
       if (!silent) toast("Couldn't load data: " + errText(e.message));
       if (/PIN/i.test(e.message)) { state.pin = ""; lsSet("pm_pin", ""); openWho(true); }
@@ -142,6 +160,7 @@
     $("banner").innerHTML = MODE_TEAM ? "" : '<div class="banner">Demo mode: marks are saved on this device only.</div>';
     renderCalendar();
     renderFreePanel();
+    renderLockPanel();
     renderDetail();
     var s = state.lastSync;
     $("sync").innerHTML = s ? "<i></i>" + (MODE_TEAM ? "Live · updated " : "Saved ") + pad(s.getHours()) + ":" + pad(s.getMinutes()) : "";
@@ -190,9 +209,27 @@
     });
   }
 
+  function renderLockPanel() {
+    var t = key(today());
+    var ks = Object.keys(state.locks).filter(function (k) { return k >= t; }).sort();
+    var el = $("lockPanel");
+    if (!CAL_URL) { el.hidden = true; return; }
+    el.hidden = false;
+    var rows = ks.map(function (k) {
+      return state.locks[k].map(function (x) {
+        return '<li><button data-k="' + k + '"><span class="ld">' + esc(shortLabel(k)) + '</span><span class="lt">' + esc(x.title) +
+          (x.time ? '<span class="meta">' + esc(x.time) + "</span>" : "") + "</span></button></li>";
+      }).join("");
+    }).join("");
+    el.innerHTML = '<div class="sec-h"><h3>🔒 Locked dates</h3><span class="sub">from PM calendar</span></div>' +
+      (ks.length ? '<ul class="lock-list">' + rows + "</ul>" : '<p class="empty">No locked dates coming up.</p>');
+    Array.prototype.forEach.call(el.querySelectorAll("button[data-k]"), function (b) { b.onclick = function () { goTo(b.dataset.k); }; });
+  }
+
   function renderDetail() {
     var k = state.sel, dm = byDate()[k] || {}, past = k < key(today()), st = statusOf(dm, k), team = teamDay(k);
-    var pill = past ? ["past", "Past date"] : team ? ["lock", "🔒 " + team + " · everyone busy"] : st === "ok" ? ["ok", "● Everyone free · OK to lock shoot"] : ["warn", "● Someone is away"];
+    var cl = (state.locks[k] || []).filter(function (x) { return x.time; }).map(function (x) { return x.time; });
+    var pill = past ? ["past", "Past date"] : team ? ["lock", "🔒 " + team + (cl.length ? " (" + cl.join(", ") + ")" : "") + " · everyone busy"] : st === "ok" ? ["ok", "● Everyone free · OK to lock shoot"] : ["warn", "● Someone is away"];
     var rows = AHLI.map(function (a) {
       var r = dm[a.id];
       if (team) return "<li>" + dotHtml(a) + '<span class="who">' + esc(a.nama) + '<span class="meta">' + esc(team) + '</span></span><span class="tag lock">Locked</span></li>';
@@ -224,7 +261,7 @@
   function toggle(k) {
     if (!state.me) return openWho();
     if (k < key(today())) return toast("That date has passed.");
-    if (teamDay(k)) return toast("🔒 " + teamDay(k) + " day. Everyone is locked.");
+    if (teamDay(k)) return toast("🔒 Locked: " + teamDay(k) + ". Everyone is busy.");
     if (state.busy) return;
     var before = state.marks.slice();
     var had = state.marks.some(function (r) { return r.date === k && r.person === state.me; });

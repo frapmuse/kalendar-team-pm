@@ -12,6 +12,9 @@ window.APP_CONFIG = {
   // Hari tetap setiap minggu di mana semua orang dikunci (dow: 0=Ahad, 1=Isnin ... 4=Khamis).
   TEAM_DAYS: [{ dow: 4, label: "Team meeting" }],
 
+  // Link Google Apps Script (baca SAHAJA calendar boss, event warna Tangerine = PM). Kosong "" = tak guna.
+  CALENDAR_URL: "",
+
   // Ahli team. Warna mesti konsisten. `wajib: true` = hari jadi MERAH bila orang ini tak available.
   AHLI: [
     { id: "Firdaus", nama: "Firdaus", inisial: "F", warna: "#2DBBF9", wajib: true },
