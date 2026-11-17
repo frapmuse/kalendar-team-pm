@@ -10,16 +10,20 @@
   var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var W = 40, H = 28, FEET = 26; // cat box and where its feet are inside it
 
+  // Solid (non-neon) cat, colours from CSS variables --fur, --line, --eye set per cat
+  var LEG = function (d) { return '<path class="ol" d="' + d + '"/><path class="fl" d="' + d + '"/>'; };
   var SVG =
     '<svg viewBox="0 0 40 28" width="40" height="28" aria-hidden="true">' +
-    '<path class="tail" d="M10 14 C3 12 3 5 7 2"/>' +
-    '<rect x="8" y="10" width="21" height="10" rx="5"/>' +
-    '<circle cx="31" cy="9" r="6"/>' +
-    '<path d="M26 5 L27 0 L30 4 M32 4 L35 0 L36 5"/>' +
-    '<circle class="eye" cx="30" cy="8.5" r="0.9"/><circle class="eye" cx="33.2" cy="8.5" r="0.9"/>' +
-    '<path d="M37 10.5 h3 M37 12 l2.6 1"/>' +
-    '<g class="legs a"><path d="M12 20 L11 26 M25 20 L26 26"/></g>' +
-    '<g class="legs b"><path d="M14 20 L15 26 M23 20 L22 26"/></g>' +
+    '<g class="tail"><path class="ol" d="M10 14 C3 12 3 5 7 2"/><path class="fl" d="M10 14 C3 12 3 5 7 2"/></g>' +
+    '<g class="legs a">' + LEG("M12 19 L11 25.5 M25 19 L26 25.5") + '</g>' +
+    '<g class="legs b">' + LEG("M14 19 L15 25.5 M23 19 L22 25.5") + '</g>' +
+    '<rect class="fur" x="8" y="10" width="21" height="10" rx="5"/>' +
+    '<path class="fur" d="M26 6.5 L27 0 L30.5 4 Z M32 4 L35.5 0 L36.4 6.5 Z"/>' +
+    '<circle class="fur" cx="31" cy="9" r="6"/>' +
+    '<path class="inner" d="M27.2 4.6 L27.6 1.8 L29.2 3.8 Z M33 3.8 L35 1.8 L35.4 4.6 Z"/>' +
+    '<ellipse class="eye" cx="29.4" cy="8.4" rx="1.1" ry="1.4"/><ellipse class="eye" cx="33.2" cy="8.4" rx="1.1" ry="1.4"/>' +
+    '<path class="nose" d="M30.6 10.6 h1.6 l-.8 .9 z"/>' +
+    '<path class="wh" d="M34.5 11 h4.5 M34.5 12.2 l4 1.2 M28 11 h-4 M28 12.2 l-3.6 1.2"/>' +
     "</svg>";
 
   var layer = document.createElement("div");
@@ -50,7 +54,7 @@
     el.className = "cat";
     el.type = "button";
     el.setAttribute("aria-label", name + " the neon cat. Tap for a message.");
-    el.style.color = color;
+    el.classList.add(color);
     el.innerHTML = SVG;
     layer.appendChild(el);
     var cat = { name: name, el: el, row: startRow, x: startX, dir: dir, speed: 0.35 + Math.random() * 0.15,
@@ -65,8 +69,8 @@
     if (!p.length) return;
     var floor = p.length - 1;
     cats = [
-      makeCat("Neko", "#2DBBF9", floor, p[floor].x0 + 10, 1, { f: 720, dur: 0.45, vib: 7 }),
-      makeCat("Momo", "#ff4fd8", Math.max(0, floor - 2), p[Math.max(0, floor - 2)].x1 - W - 10, -1, { f: 430, dur: 0.75, vib: 5 })
+      makeCat("Snow", "white", floor, p[floor].x0 + 10, 1, { f: 720, dur: 0.45, vib: 7 }),
+      makeCat("Shadow", "black", Math.max(0, floor - 2), p[Math.max(0, floor - 2)].x1 - W - 10, -1, { f: 430, dur: 0.75, vib: 5 })
     ];
   }
 
