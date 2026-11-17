@@ -1,12 +1,14 @@
 # Kalendar Team PM
 
+Antara muka app dalam English, rupa gelap futuristik (neon biru PM).
+
 App ringkas untuk team Produksi Mayasari: setiap orang tekan tarikh yang mereka **TAK available**, dan semua orang nampak hari mana boleh lock shoot.
 
 - 🟢 Hijau: semua 4 orang ada, boleh lock shoot
 - 🟡 Kuning: ada yang tak ada (bulatan inisial tunjuk siapa)
 - 🔴 Merah: Firdaus atau Amin tak ada
-- Panel "Semua masih available": hari kosong 30 hari depan, sentiasa nampak
-- Butang "Cari tarikh kosong": senarai 30 atau 60 hari
+- Panel "Everyone available": hari kosong 30 hari depan, sentiasa nampak
+- Butang "Find free dates": senarai 30 atau 60 hari
 
 App ini **tidak** bersambung dengan Google Calendar. Jemputan shoot tetap dihantar macam biasa.
 
@@ -14,8 +16,8 @@ App ini **tidak** bersambung dengan Google Calendar. Jemputan shoot tetap dihant
 
 1. Buka pautan app dalam Safari.
 2. Pilih nama anda (dan PIN team bila mod team dah dihidupkan).
-3. Mod **✋ Tanda saya**: tekan tarikh anda tak available. Tekan sekali lagi untuk buang.
-4. Mod **👀 Lihat sahaja**: tekan tarikh untuk tengok siapa ada, tanpa ubah apa-apa.
+3. Mod **✋ Mark me**: tekan tarikh anda tak available. Tekan sekali lagi untuk buang.
+4. Mod **👁 View only**: tekan tarikh untuk tengok siapa ada, tanpa ubah apa-apa.
 5. Butang Kongsi (petak dengan anak panah) > **Add to Home Screen** supaya jadi macam app.
 
 ## Fail

@@ -1,8 +1,8 @@
 {
-  "name": "Kalendar Team PM",
+  "name": "PM Team Calendar",
   "short_name": "Team PM",
-  "description": "Semak siapa available sebelum kunci tarikh shoot.",
-  "lang": "ms",
+  "description": "Check who is available before locking a shoot date.",
+  "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
