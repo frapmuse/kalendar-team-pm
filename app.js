@@ -212,7 +212,10 @@
 
   function renderLockPanel() {
     var t = key(today());
-    var ks = Object.keys(state.locks).filter(function (k) { return k >= t; }).sort();
+    // only the month shown in the calendar above
+    var mPrefix = state.view.getFullYear() + "-" + pad(state.view.getMonth() + 1) + "-";
+    var mName = MONTHS[state.view.getMonth()];
+    var ks = Object.keys(state.locks).filter(function (k) { return k.indexOf(mPrefix) === 0; }).sort();
     var el = $("lockPanel"), tabs = $("listTabs");
     var tab = CAL_URL ? state.tab : "free";
     tabs.hidden = !CAL_URL;
@@ -222,12 +225,12 @@
     if (!CAL_URL) return;
     var rows = ks.map(function (k) {
       return state.locks[k].map(function (x) {
-        return '<li><button data-k="' + k + '"><span class="ld">' + esc(shortLabel(k)) + '</span><span class="lt">' + esc(x.title) +
+        return '<li' + (k < t ? ' class="past"' : "") + '><button data-k="' + k + '"><span class="ld">' + esc(shortLabel(k)) + '</span><span class="lt">' + esc(x.title) +
           (x.time ? '<span class="meta">' + esc(x.time) + "</span>" : "") + "</span></button></li>";
       }).join("");
     }).join("");
-    el.innerHTML = '<div class="sec-h"><h3>🔒 Locked dates</h3><span class="sub">from PM calendar</span></div>' +
-      (ks.length ? '<ul class="lock-list">' + rows + "</ul>" : '<p class="empty">No locked dates coming up.</p>');
+    el.innerHTML = '<div class="sec-h"><h3>🔒 Locked dates</h3><span class="sub">' + esc(mName) + " · from PM calendar</span></div>" +
+      (ks.length ? '<ul class="lock-list">' + rows + "</ul>" : '<p class="empty">No locked dates in ' + esc(mName) + ".</p>");
     Array.prototype.forEach.call(el.querySelectorAll("button[data-k]"), function (b) { b.onclick = function () { goTo(b.dataset.k); }; });
   }
 
