@@ -131,7 +131,6 @@
     $("hint").textContent = state.mode === "mark"
       ? "Mark mode: tap a date you are NOT available. Tap it again to remove."
       : "View mode: tap a date to see details without changing anything.";
-    $("legendBad").textContent = (KEY_IDS.join("/") || "Key people") + " away";
     $("banner").innerHTML = MODE_TEAM ? "" : '<div class="banner">Demo mode: marks are saved on this device only.</div>';
     renderCalendar();
     renderFreePanel();
