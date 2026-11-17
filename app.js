@@ -162,7 +162,7 @@
       if (k === state.sel) cls.push("sel");
       if (dm[state.me]) cls.push("mine");
       var team = teamDay(k);
-      var away = team ? AHLI : AHLI.filter(function (a) { return dm[a.id]; });
+      var away = team ? [] : AHLI.filter(function (a) { return dm[a.id]; });
       var aria = longLabel(k) + ". " + (team ? team + ", everyone busy" : away.length ? "Not available: " + away.map(function (a) { return a.nama; }).join(", ") : "Everyone available");
       html += '<button class="' + cls.join(" ") + '" data-k="' + k + '" aria-label="' + esc(aria) + '"><span class="num">' + d +
         '</span><span class="dots' + (away.length > 2 ? " many" : "") + '">' + away.map(dotHtml).join("") + "</span></button>";

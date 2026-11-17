@@ -70,8 +70,9 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .day.ok{background:linear-gradient(180deg,transparent,var(--ok-bg))}
 .day.warn{background:linear-gradient(180deg,transparent,var(--warn-bg))}.day.warn::before{background:var(--warn);box-shadow:0 0 10px var(--warn)}
 .day.bad{background:linear-gradient(180deg,transparent,var(--bad-bg))}.day.bad::before{background:var(--bad);box-shadow:0 0 10px var(--bad)}
-.day.lock{background:linear-gradient(180deg,transparent,rgba(45,187,249,.12));border-color:rgba(45,187,249,.3)}
-.day.lock::before{background:var(--brand);box-shadow:0 0 10px var(--brand)}
+.day.lock{background:linear-gradient(160deg,#2DBBF9,#1b8fd0);border-color:transparent;color:#03111c;box-shadow:0 0 14px rgba(45,187,249,.35)}
+.day.lock::before{display:none}
+.day.lock.past{background:linear-gradient(160deg,#2DBBF9,#1b8fd0);opacity:.3}
 .pill.lock{color:var(--brand);border-color:rgba(45,187,249,.4);background:rgba(45,187,249,.10)}
 .tag.lock{color:var(--brand);background:rgba(45,187,249,.12)}
 .day.past{opacity:.35;background:transparent}.day.past::before{display:none}
@@ -251,7 +252,7 @@ label.f{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;letter
     <div class="legend">
       <span><i class="sw" style="background:var(--ok);box-shadow:0 0 6px var(--ok)"></i>Everyone free</span>
       <span><i class="sw" style="background:var(--warn);box-shadow:0 0 6px var(--warn)"></i>Someone away</span>
-      <span><i class="sw" style="background:var(--brand);box-shadow:0 0 6px var(--brand)"></i>🔒 Team meeting (Thu)</span>
+      <span><i class="sw" style="background:var(--brand);box-shadow:0 0 6px var(--brand);height:10px;width:12px;border-radius:3px"></i>Team meeting (Thu)</span>
     </div>
   </section>
 
