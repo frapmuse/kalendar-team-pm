@@ -170,7 +170,7 @@
   // Panel sentiasa nampak: hari semua orang masih available (30 hari depan)
   function freeDays(n) {
     var t = today(), map = byDate(), list = [];
-    for (var i = 0; i <= n; i++) { var k = key(addDays(t, i)); if (statusOf(map[k]) === "ok") list.push(k); }
+    for (var i = 0; i < n; i++) { var k = key(addDays(t, i)); if (statusOf(map[k]) === "ok") list.push(k); }
     return list;
   }
   function renderFreePanel() {
