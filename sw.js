@@ -1,6 +1,6 @@
 // Service worker ringkas: app boleh dibuka walaupun internet lemah.
 // Data team sentiasa diambil terus dari internet (tidak disimpan di sini).
-var CACHE = "team-pm-v13";
+var CACHE = "team-pm-v14";
 var SHELL = ["./", "index.html", "app.js", "cats.js", "config.js", "manifest.webmanifest", "icons/icon.svg", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", function (e) {
@@ -15,7 +15,8 @@ self.addEventListener("activate", function (e) {
 self.addEventListener("fetch", function (e) {
   var u = new URL(e.request.url);
   if (e.request.method !== "GET" || u.origin !== location.origin) return;
-  e.respondWith(fetch(e.request).then(function (r) {
+  // cache:"no-cache" = always ask the server for the latest version (GitHub Pages caches 10 min)
+  e.respondWith(fetch(e.request, { cache: "no-cache" }).then(function (r) {
     var copy = r.clone(); caches.open(CACHE).then(function (c) { c.put(e.request, copy); });
     return r;
   }).catch(function () { return caches.match(e.request); }));
