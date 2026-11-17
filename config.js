@@ -10,7 +10,8 @@ window.APP_CONFIG = {
   SUPABASE_KEY: "sb_publishable_iaOE2on1je3m66_G8vqS2A_3hgApJ-F", // kunci publishable (awam)
 
   // Hari tetap setiap minggu di mana semua orang dikunci (dow: 0=Ahad, 1=Isnin ... 4=Khamis).
-  TEAM_DAYS: [{ dow: 4, label: "Team meeting" }],
+  // Kosong: boss kunci tarikh melalui Google Calendar (event Tangerine) sahaja.
+  TEAM_DAYS: [],
 
   // Link Google Apps Script (baca SAHAJA calendar boss, event warna Tangerine = PM). Kosong "" = tak guna.
   CALENDAR_URL: "",
