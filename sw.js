@@ -1,6 +1,6 @@
 // Service worker ringkas: app boleh dibuka walaupun internet lemah.
 // Data team sentiasa diambil terus dari internet (tidak disimpan di sini).
-var CACHE = "team-pm-v19";
+var CACHE = "team-pm-v20";
 var SHELL = ["./", "index.html", "app.js", "cats.js", "config.js", "manifest.webmanifest", "icons/icon.svg", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", function (e) {

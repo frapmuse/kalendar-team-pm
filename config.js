@@ -18,7 +18,7 @@ window.APP_CONFIG = {
 
   // Ahli team. Warna mesti konsisten. `wajib: true` = hari jadi MERAH bila orang ini tak available.
   AHLI: [
-    { id: "Firdaus", nama: "Firdaus", inisial: "F", warna: "#2DBBF9", wajib: true },
+    { id: "Firdaus", nama: "Firdaus", inisial: "F", warna: "#F1F5F9", wajib: true },
     { id: "Amin", nama: "Amin", inisial: "A", warna: "#FACC15", wajib: true },
     { id: "Hana", nama: "Hana", inisial: "H", warna: "#A855F7", wajib: false },
     { id: "Amalina", nama: "Amalina (Emma)", inisial: "E", warna: "#EC4899", wajib: false }
