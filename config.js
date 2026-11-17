@@ -14,7 +14,7 @@ window.APP_CONFIG = {
   TEAM_DAYS: [],
 
   // Link Google Apps Script (baca SAHAJA calendar boss, event warna Tangerine = PM). Kosong "" = tak guna.
-  CALENDAR_URL: "",
+  CALENDAR_URL: "https://script.google.com/macros/s/AKfycbzTuaThSeeFrIV2YrU6KGuKdykMM9fIcGMqPrZRY6ucdhT-x-Li0PPlyBAy95eGQLLyDA/exec",
 
   // Ahli team. Warna mesti konsisten. `wajib: true` = hari jadi MERAH bila orang ini tak available.
   AHLI: [
