@@ -22,8 +22,8 @@
   --brand:#2DBBF9; --brand-2:#7c5cff; --glow:0 0 0 1px rgba(45,187,249,.55),0 0 18px rgba(45,187,249,.45);
   --bg:#050a14; --ink:#e9f4ff; --muted:#8a9bb4; --faint:#5b6b82;
   --glass:rgba(255,255,255,.045); --glass-2:rgba(255,255,255,.08); --line:rgba(160,200,255,.12);
-  --ok:#34f5a0; --warn:#ffc857; --bad:#ff4d6d;
-  --ok-bg:rgba(52,245,160,.10); --warn-bg:rgba(255,200,87,.10); --bad-bg:rgba(255,77,109,.12);
+  --ok:#34f5a0; --warn:#c4b5fd; --team:#ff8a3d; --bad:#ff4d6d;
+  --ok-bg:rgba(52,245,160,.10); --warn-bg:rgba(196,181,253,.12); --bad-bg:rgba(255,77,109,.12);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
@@ -48,7 +48,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .brand small{display:block;font-size:11px;font-weight:400;letter-spacing:2px;text-transform:uppercase;color:var(--brand)}
 .me{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:4px 12px 4px 4px;font-size:13px;flex:none}
 .dot{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;color:#06101c;font-size:11px;font-weight:700;flex:none}
-.banner{margin:0 0 12px;padding:10px 14px;border-radius:14px;font-size:12.5px;background:var(--warn-bg);color:var(--warn);border:1px solid rgba(255,200,87,.25)}
+.banner{margin:0 0 12px;padding:10px 14px;border-radius:14px;font-size:12.5px;background:var(--warn-bg);color:var(--warn);border:1px solid rgba(196,181,253,.25)}
 /* Mod */
 .mode{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin-bottom:12px;border-radius:16px}
 .mode button{border:0;background:none;padding:11px 8px;border-radius:12px;font-size:13.5px;color:var(--muted);transition:all .2s}
@@ -70,11 +70,11 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .day.ok{background:linear-gradient(180deg,transparent,var(--ok-bg))}
 .day.warn{background:linear-gradient(180deg,transparent,var(--warn-bg))}.day.warn::before{background:var(--warn);box-shadow:0 0 10px var(--warn)}
 .day.bad{background:linear-gradient(180deg,transparent,var(--bad-bg))}.day.bad::before{background:var(--bad);box-shadow:0 0 10px var(--bad)}
-.day.lock{background:linear-gradient(160deg,#2DBBF9,#1b8fd0);border-color:transparent;color:#03111c;box-shadow:0 0 14px rgba(45,187,249,.35)}
+.day.lock{background:linear-gradient(160deg,#ffa25c,#f26b1d);border-color:transparent;color:#1c0a00;box-shadow:0 0 14px rgba(255,138,61,.35)}
 .day.lock::before{display:none}
-.day.lock.past{background:linear-gradient(160deg,#2DBBF9,#1b8fd0);opacity:.3}
-.pill.lock{color:var(--brand);border-color:rgba(45,187,249,.4);background:rgba(45,187,249,.10)}
-.tag.lock{color:var(--brand);background:rgba(45,187,249,.12)}
+.day.lock.past{background:linear-gradient(160deg,#ffa25c,#f26b1d);opacity:.3}
+.pill.lock{color:var(--team);border-color:rgba(255,138,61,.4);background:rgba(255,138,61,.10)}
+.tag.lock{color:var(--team);background:rgba(255,138,61,.12)}
 .day.past{opacity:.35;background:transparent}.day.past::before{display:none}
 .day.out{visibility:hidden}
 .day.today .num{color:var(--brand);text-shadow:0 0 10px rgba(45,187,249,.9)}
@@ -108,7 +108,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .detail h3.date{margin:0;font-size:19px;font-weight:600;letter-spacing:.2px;text-transform:none;color:var(--ink)}
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;padding:4px 10px;border-radius:999px;margin:8px 0 4px;border:1px solid}
 .pill.ok{color:var(--ok);border-color:rgba(52,245,160,.35);background:var(--ok-bg)}
-.pill.warn{color:var(--warn);border-color:rgba(255,200,87,.35);background:var(--warn-bg)}
+.pill.warn{color:var(--warn);border-color:rgba(196,181,253,.35);background:var(--warn-bg)}
 .pill.bad{color:var(--bad);border-color:rgba(255,77,109,.35);background:var(--bad-bg)}
 .pill.past{color:var(--muted);border-color:var(--line)}
 .freeline{font-size:13px;color:var(--ok);margin:6px 0 2px}
@@ -252,7 +252,7 @@ label.f{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;letter
     <div class="legend">
       <span><i class="sw" style="background:var(--ok);box-shadow:0 0 6px var(--ok)"></i>Everyone free</span>
       <span><i class="sw" style="background:var(--warn);box-shadow:0 0 6px var(--warn)"></i>Someone away</span>
-      <span><i class="sw" style="background:var(--brand);box-shadow:0 0 6px var(--brand);height:10px;width:12px;border-radius:3px"></i>Team meeting (Thu)</span>
+      <span><i class="sw" style="background:var(--team);box-shadow:0 0 6px var(--team);height:10px;width:12px;border-radius:3px"></i>Team meeting (Thu)</span>
     </div>
   </section>
 
