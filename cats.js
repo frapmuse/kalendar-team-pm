@@ -45,7 +45,7 @@
   }
 
   // ---------- cats ----------
-  function makeCat(name, color, startRow, startX, dir) {
+  function makeCat(name, color, startRow, startX, dir, voice) {
     var el = document.createElement("button");
     el.className = "cat";
     el.type = "button";
@@ -54,7 +54,7 @@
     el.innerHTML = SVG;
     layer.appendChild(el);
     var cat = { name: name, el: el, row: startRow, x: startX, dir: dir, speed: 0.35 + Math.random() * 0.15,
-      mode: "walk", until: 0, jump: null, step: 0, cool: 0 };
+      mode: "walk", until: 0, jump: null, step: 0, cool: 0, voice: voice };
     el.addEventListener("click", function (e) { e.stopPropagation(); tapCat(cat); });
     return cat;
   }
@@ -65,8 +65,8 @@
     if (!p.length) return;
     var floor = p.length - 1;
     cats = [
-      makeCat("Neko", "#2DBBF9", floor, p[floor].x0 + 10, 1),
-      makeCat("Momo", "#ff4fd8", Math.max(0, floor - 2), p[Math.max(0, floor - 2)].x1 - W - 10, -1)
+      makeCat("Neko", "#2DBBF9", floor, p[floor].x0 + 10, 1, { f: 720, dur: 0.45, vib: 7 }),
+      makeCat("Momo", "#ff4fd8", Math.max(0, floor - 2), p[Math.max(0, floor - 2)].x1 - W - 10, -1, { f: 430, dur: 0.75, vib: 5 })
     ];
   }
 
@@ -96,19 +96,62 @@
   layer.appendChild(bubble);
   var bubbleTimer = null, bubbleCat = null, lastLine = "";
 
+  function showBubble(cat, text, ms) {
+    bubble.textContent = text;
+    bubble.classList.add("show");
+    bubbleCat = cat;
+    if (!REDUCED) { cat.mode = "sit"; cat.until = performance.now() + (ms || 3500); }
+    cat.el.classList.add("happy");
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(function () { bubble.classList.remove("show"); bubbleCat = null; cat.el.classList.remove("happy"); }, (ms || 3500) + 100);
+  }
   function tapCat(cat) {
+    meow(cat);
     var lines = (window.PMApp && window.PMApp.catLines) ? window.PMApp.catLines() : ["Meow! 🐾"];
     var pick;
     do { pick = lines[Math.floor(Math.random() * lines.length)]; } while (lines.length > 1 && pick === lastLine);
     lastLine = pick;
-    bubble.textContent = pick;
-    bubble.classList.add("show");
-    bubbleCat = cat;
-    if (!REDUCED) { cat.mode = "sit"; cat.until = performance.now() + 3500; }
-    cat.el.classList.add("happy");
-    clearTimeout(bubbleTimer);
-    bubbleTimer = setTimeout(function () { bubble.classList.remove("show"); bubbleCat = null; cat.el.classList.remove("happy"); }, 3600);
+    showBubble(cat, pick);
   }
+  // Personal hello for whoever has the app open
+  function greet(name) {
+    if (!cats.length || !name) return;
+    var h = new Date().getHours();
+    var part = h < 12 ? "Good morning" : h < 19 ? "Good afternoon" : "Good evening";
+    var cat = cats[Math.floor(Math.random() * cats.length)];
+    showBubble(cat, "Meow! " + part + ", " + name + "! 👋", 4500);
+  }
+  window.PMCats = { greet: greet };
+
+  // ---------- voices: synthesised meows (no audio files), a different voice per cat ----------
+  var actx = null;
+  function meow(cat) {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      actx = actx || new AC();
+      if (actx.state === "suspended") actx.resume();
+      var v = cat.voice, t = actx.currentTime, d = v.dur;
+      var osc = actx.createOscillator(), filt = actx.createBiquadFilter(), gain = actx.createGain();
+      var lfo = actx.createOscillator(), lfoGain = actx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(v.f * 0.85, t);
+      osc.frequency.linearRampToValueAtTime(v.f * 1.3, t + d * 0.35);
+      osc.frequency.linearRampToValueAtTime(v.f * 0.75, t + d);
+      lfo.frequency.value = v.vib; lfoGain.gain.value = v.f * 0.03;
+      lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
+      filt.type = "bandpass"; filt.Q.value = 5;
+      filt.frequency.setValueAtTime(v.f * 1.4, t);                 // "mm"
+      filt.frequency.linearRampToValueAtTime(v.f * 3.2, t + d * 0.4); // "eee"
+      filt.frequency.linearRampToValueAtTime(v.f * 1.6, t + d);       // "ow"
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.5, t + 0.04);
+      gain.gain.setValueAtTime(0.45, t + d * 0.7);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      osc.connect(filt); filt.connect(gain); gain.connect(actx.destination);
+      osc.start(t); lfo.start(t); osc.stop(t + d + 0.05); lfo.stop(t + d + 0.05);
+    } catch (e) { /* no sound, no problem */ }
+  }
+
   function placeBubble() {
     if (!bubbleCat) return;
     var p = platforms()[bubbleCat.row]; if (!p) return;
@@ -119,24 +162,27 @@
     bubble.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y) + "px)";
   }
 
-  // ---------- fight when face to face on the same row ----------
+  // ---------- when they meet face to face: sometimes a fight, sometimes they make up ----------
   var cloud = document.createElement("div");
   cloud.className = "cat-fight";
-  cloud.innerHTML = "<span>💥</span><i>✦</i><i>✧</i><i>✦</i>";
   layer.appendChild(cloud);
+  var FIGHT = "<span>💥</span><i>✦</i><i>✧</i><i>✦</i>";
+  var LOVE = "<span>💞</span><i>♥</i><i>♥</i><i>♥</i>";
 
-  function checkFight(now) {
+  function checkMeet(now) {
     if (cats.length < 2) return;
     var a = cats[0], b = cats[1];
     if (a.mode !== "walk" || b.mode !== "walk" || a.row !== b.row || now < a.cool || now < b.cool) return;
     var left = a.x < b.x ? a : b, right = left === a ? b : a;
     if (right.x - left.x > W - 4) return;
     if (left.dir !== 1 || right.dir !== -1) return; // must face each other
-    [a, b].forEach(function (c) { c.mode = "fight"; c.until = now + 1700; c.el.classList.add("angry"); });
+    var love = Math.random() < 0.5;
+    [a, b].forEach(function (c) { c.mode = "meet"; c.until = now + (love ? 2200 : 1700); c.el.classList.add(love ? "love" : "angry"); });
     var p = platforms()[a.row];
+    cloud.innerHTML = love ? LOVE : FIGHT;
+    cloud.className = "cat-fight show" + (love ? " love" : "");
     cloud.style.transform = "translate(" + Math.round((left.x + right.x) / 2 + W / 2 - 22) + "px," + Math.round(p.y - FEET - 10) + "px)";
-    cloud.classList.add("show");
-    setTimeout(function () { cloud.classList.remove("show"); }, 1700);
+    setTimeout(function () { cloud.classList.remove("show"); }, love ? 2200 : 1700);
   }
 
   // ---------- loop ----------
@@ -156,10 +202,10 @@
         if (t >= 1) { cat.row = j.to; cat.mode = "walk"; cat.jump = null; cat.el.classList.remove("jumping"); }
         return;
       }
-      if (cat.mode === "sit" || cat.mode === "fight" || cat.mode === "rest") {
+      if (cat.mode === "sit" || cat.mode === "meet" || cat.mode === "rest") {
         cat.el.classList.remove("walking");
         if (now > cat.until) {
-          if (cat.mode === "fight") { cat.dir *= -1; cat.cool = now + 6000; cat.el.classList.remove("angry"); }
+          if (cat.mode === "meet") { cat.dir *= -1; cat.cool = now + 6000; cat.el.classList.remove("angry", "love"); }
           cat.mode = "walk";
         }
         place(cat, cat.x, pl.y);
@@ -177,7 +223,7 @@
       else if (r < 0.0035) { cat.mode = "rest"; cat.until = now + 1200 + Math.random() * 1800; }
       if (cat.mode === "walk") place(cat, cat.x, pl.y);
     });
-    checkFight(now);
+    checkMeet(now);
     placeBubble();
     requestAnimationFrame(tick);
   }
@@ -187,6 +233,8 @@
     if (!cats.length) return;
     if (REDUCED) cats.forEach(function (c) { c.mode = "rest"; c.until = Infinity; });
     requestAnimationFrame(tick);
+    var me = window.PMApp && window.PMApp.me && window.PMApp.me();
+    if (me) setTimeout(function () { greet(me); }, 1200);
   }
   // Wait until the calendar has drawn its cells
   if (grid.querySelector(".day[data-k]")) start(); else setTimeout(start, 300);

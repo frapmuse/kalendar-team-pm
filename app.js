@@ -277,7 +277,7 @@
         state.me = chosen; lsSet("pm_me", chosen);
         if (MODE_TEAM) lsSet("pm_pin", pin);
         closeSheet(); setMarks(m);
-        toast("Hi " + first(person(chosen).nama) + "!");
+        if (window.PMCats) window.PMCats.greet(first(person(chosen).nama)); else toast("Hi " + first(person(chosen).nama) + "!");
       }).catch(function (e) {
         btn.disabled = false; btn.textContent = "Continue";
         toast(errText(e.message));
@@ -325,13 +325,21 @@
       lines.push(mine ? "You have " + mine + " day" + (mine > 1 ? "s" : "") + " marked as away. Still correct? 🤔"
         : "Any days you can't make it? Tap them so the team knows 🐾");
     }
+    if (me) {
+      var nm = first(me.nama);
+      lines.push("Hi " + nm + "! 👋", "Meow, " + nm + "! Nice to see you 😺");
+      var extra = { Firdaus: "Boss " + nm + ", ready to lock the next shoot? 😼",
+        Amin: nm + ", camera batteries charged? 🎥", Hana: nm + ", script ready for the next shoot? ✍️",
+        Amalina: nm + ", any content ideas today? 💡" }[me.id];
+      if (extra) lines.push(extra);
+    }
     var dow = t.getDay();
     if (dow === 1) lines.push("New week, new content 💪");
     if (dow === 5) lines.push("Happy Friday, team PM! 🎉");
     lines.push("Have an awesome shoot! 🎬", "Drink some water 💧", "You're doing great, team PM 💙", "Meow. Lock that date, boss 😼", "Purr... good vibes only ✨");
     return lines;
   }
-  window.PMApp = { catLines: catLines };
+  window.PMApp = { catLines: catLines, me: function () { var p = person(state.me); return p ? first(p.nama) : null; } };
 
   // ---------- wire up ----------
   $("grid").onclick = function (e) { var b = e.target.closest(".day[data-k]"); if (b) onDayTap(b.dataset.k); };
